@@ -28,6 +28,10 @@ contract Chat {
         emit NewQuestion(creator, _question, token);
     }
 
+    function getResult(address creator) public view returns (uint256) {
+        return rewards[creator];
+    }
+
     // coprocessor에 의해 보상이 지급될 때 호출되는 콜백 함수
 		// coprocessor는 컨트랙트 주인을 뜻하는 것 같음
     // ICP chain fusion canister에서 실행하는 함수
