@@ -3,10 +3,10 @@ pragma solidity >=0.7.0 <0.9.0;
 
 contract Chat {
 
-    address payable private immutable coprocessor;
+    address payable private immutable contractOwner;
 
-    constructor(address _coprocessor) {
-        coprocessor = payable(_coprocessor);
+    constructor(address _contractOwner) {
+        contractOwner = payable(_contractOwner);
     }
 
     mapping(address => uint) public rewards;
@@ -21,7 +21,7 @@ contract Chat {
 
         // 전송 받은 ETH를 코어 프로세서 주소로 보냄 
         // 작업을 EVM 컨트랙트로 다시 보내기 위한 값임
-        (bool success, ) = coprocessor.call{value: msg.value}("");
+        (bool success, ) = contractOwner.call{value: msg.value}("");
         require(success, "Transfer failed.");
 
         // 새로운 작업 이벤트를 배포함
@@ -33,8 +33,8 @@ contract Chat {
     // ICP chain fusion canister에서 실행하는 함수
     function callback(address creator, uint256 reward) public {
         require(
-            msg.sender == coprocessor,
-            "Only the coprocessor can call this function"
+            msg.sender == contractOwner,
+            "Only the contract Owner can call this function"
         );
 
         // 보상 증가
