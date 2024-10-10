@@ -5,7 +5,7 @@ import "forge-std/Script.sol";
 import "../contracts/Chat.sol";
 
 contract MyScript is Script {
-    function run(address chain_fusion_canister_address) external {
+    function run(address chain_fusion_canister_address, address creator) external {
         // the private key of the deployer is the first private key printed by running anvil
         uint256 deployerPrivateKey = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
         // we use that key to broadcast all following transactions
@@ -16,9 +16,9 @@ contract MyScript is Script {
 
         Chat chat = new Chat(chain_fusion_canister_address);
 
-       // we create 3 jobs
+       // we create 3 questions
         for (uint256 index = 0; index < 3; index++) {
-            chat.question{value: 0.1 ether}("sdf", 1);
+            chat.newQuestion{value: 0.1 ether}(creator, "question string", index+10);
         }
 
         vm.stopBroadcast();

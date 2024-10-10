@@ -11,11 +11,11 @@ contract Chat {
 
     mapping(address => uint) public rewards;
 
-    event NewQuestion(string question, uint256 token);
+    event NewQuestion(address creator, string question, uint256 token);
 
     // 새로운 작업 생성을 위한 함수
     // User가 사용하는 함수
-    function question(string memory _question, uint256 token) public payable {
+    function newQuestion(address creator, string memory _question, uint256 token) public payable {
         // 콜을 보내기 위해서는 0.01 ETH 필요 
         require(msg.value >= 0.01 ether, "Minimum 0.01 ETH not met");
 
@@ -25,7 +25,7 @@ contract Chat {
         require(success, "Transfer failed.");
 
         // 새로운 작업 이벤트를 배포함
-        emit NewQuestion(_question, token);
+        emit NewQuestion(creator, _question, token);
     }
 
     // coprocessor에 의해 보상이 지급될 때 호출되는 콜백 함수
