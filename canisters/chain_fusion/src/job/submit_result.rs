@@ -1,4 +1,4 @@
-use ethers_core::{abi::Token, types::U256};
+use ethers_core::{abi::Token, types::U256, types::H160};
 use evm_rpc_canister_types::{BlockTag, GetTransactionCountArgs, EVM_RPC};
 use ic_evm_utils::{
     conversions::nat_to_u256,
@@ -8,7 +8,8 @@ use ic_evm_utils::{
 
 use crate::state::{mutate_state, read_state, State};
 
-pub async fn submit_result(result: String, job_id: U256) {
+// pub async fn submit_result(result: String, job_id: U256) {
+pub async fn submit_question(creator: String, token: U256) {
     // get necessary global state
     let contract_address = &read_state(State::get_logs_addresses)[0];
     let rpc_services = read_state(State::rpc_services);
@@ -22,12 +23,12 @@ pub async fn submit_result(result: String, job_id: U256) {
             "name": "callback",
             "inputs": [
                 {
-                    "name": "_result",
-                    "type": "string",
-                    "internalType": "string"
+                    "name": "creator",
+                    "type": "address",
+                    "internalType": "address"
                 },
                 {
-                    "name": "_job_id",
+                    "name": "reward",
                     "type": "uint256",
                     "internalType": "uint256"
                 }
@@ -40,12 +41,14 @@ pub async fn submit_result(result: String, job_id: U256) {
 
     let abi =
         serde_json::from_str::<ethers_core::abi::Contract>(abi_json).expect("should serialise");
+    
+    let creator_address: H160 = H160::from_slice(&hex::decode(&creator[2..]).expect("Invalid hex string"));
 
     let contract_details = ContractDetails {
         contract_address: contract_address.clone(),
         abi: &abi,
         function_name: "callback",
-        args: &[Token::String(result), Token::Uint(job_id)],
+        args: &[Token::Address(creator_address), Token::Uint(token)],
     };
 
     // set the gas
